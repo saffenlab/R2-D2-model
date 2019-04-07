@@ -3,9 +3,9 @@ R2-D2 model is a statistical method to identify the potential regulatory genetic
 
 #### If you find our model useful in your research, please cite:
 
-(XXXXXXX)
+...........
 
-### Table of Contents
+## Table of Contents
 
 #### 1. [Prepare input files](#prepare-input-files)
 #### 2. [Download the scripts in this repository](https://github.com/saffenlab/R2-D2-model.git)
