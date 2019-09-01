@@ -1,9 +1,8 @@
 # R2-D2-model
 R2-D2 model is a statistical method to identify the potential regulatory genetic variants to a gene. (add more description here once it is published).
 
-#### If you find our model useful in your research, please cite:
 
-...........
+
 
 ## Table of Contents
 
