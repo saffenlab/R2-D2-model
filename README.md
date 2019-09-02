@@ -13,6 +13,17 @@ R2-D2 model is a statistical method to identify the potential regulatory genetic
 #### 5. [Example](#example)
 
 -------------------------------------------------------------------------------------------------------------------------------------
+## Requirements:
+
+R version >= 3.3.0
+
+required R packages:
+
+    MASS
+    RcppEigen  
+    data.table
+
+-------------------------------------------------------------------------------------------------------------------------------------
 ## Prepare input files
 Three types of input files are needed to run this model. 
 
