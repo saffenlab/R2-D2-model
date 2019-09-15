@@ -76,12 +76,13 @@ pBar <- function (x, percent = 0) {
 
 ## Main function
 comTest_matrix <- function (geno, qassoc, num, save_interm=FALSE) {
+  if (num < 0) {stop("num must be non-negative!")}
   start <- Sys.time()
   pBar(0)
   ## input data
   R2B.regss <- extract_R2(qassoc)
   P <- extract_P(qassoc)
-  if (num < 4)
+  if (num <= 4)
     p.05 <- (P < 0.05) ## choose only significant SNPs
   else
     p.05 <- (P < 0.0001) ## 
@@ -98,6 +99,7 @@ comTest_matrix <- function (geno, qassoc, num, save_interm=FALSE) {
   nSNPs <- length(snpName_uniq)
   pBar(4)
   
+  if (num > 0) {
   ## Combination calculation
   N <- choose(nSNPs, num)
   combi <- combn(nSNPs, num)
@@ -198,9 +200,15 @@ comTest_matrix <- function (geno, qassoc, num, save_interm=FALSE) {
   write.table(res, paste0(qassoc, "-", num, "snps-m.txt"), quote=F, sep="\t", row.names=F) 
   write.table(plot.file, paste0(qassoc, "-", num, "snps-plot-m.txt"), quote=F, sep="\t", row.names=F) 
   
+  } ## <-- end of if (num > 0)
+  else {
+    write.table(data.frame(SNP = snpName, R2 = R2B.regss, P=P), paste0(qassoc, "-", num, "snps-plot-m.txt"), quote=F, sep="\t", row.names=F) 
+  }
   ## Save intermediate files
   if (save_interm) {
-    write.table(rGG, paste0(qassoc, "-", num, "snps-rGG.txt"), quote=F, sep="\t", row.names=T) 
+    snp_name_df = cbind(snpName, rGG)
+    colnames(snp_name_df) <- c('rsID', snpName)
+    write.table(snp_name_df, paste0(qassoc, "-", num, "snps-r2GG.txt"), quote=F, sep="\t", row.names=F) 
   }
   
   end <- Sys.time() 
@@ -380,10 +388,7 @@ familyPlot_matrix <- function (plot_file, title, color = c('black', 'red', 'gree
   
   fileName <- paste0(plotTitle, ".pdf") 
   pdf(fileName, height=100, width=300) # 90-500
-  par(mfrow = c(2, 1), mar=c(40,30,5,2), las = 2, cex.lab=15, cex.axis=15)#, mgp=c(40, 1, 0))#
   
-  snps <- colnames(E.all)[-c(1, 2, ncol(E.all)-1, ncol(E.all))]#
-  m <- length(snps) # number of index snps
   nSNPs <- nrow(E.all) # total number of snps
   snpName <- E.all$SNP
   
@@ -391,6 +396,19 @@ familyPlot_matrix <- function (plot_file, title, color = c('black', 'red', 'gree
   
   for(i in 1:nSNPs)
     fill_colors[i] <- ifelse(E.all$P[i] < 0.05, "#99CCFF", "#cccccc")
+  
+  ## if no iSNP provided, only plot the R2 as barplot
+  if (ncol(E.all) == 3) {
+    par(mfrow = c(1, 1), mar=c(145,30,145,2), las = 2, cex.lab=15, cex.axis=15)#, mgp=c(40, 1, 0))#
+    mp <- barplot(E.all$R2, names.arg=snpName,
+                  col=fill_colors, horiz=FALSE, border=NA, xpd = F,cex.names=8)
+  } 
+  else 
+  {
+  par(mfrow = c(2, 1), mar=c(40,30,5,2), las = 2, cex.lab=15, cex.axis=15)#, mgp=c(40, 1, 0))#
+  
+  snps <- colnames(E.all)[-c(1, 2, ncol(E.all)-1, ncol(E.all))]#
+  m <- length(snps) # number of index snps
   
   lm_stats <- round(fastStats(E.all$R2, E.all$R2_predicted), digits = 3)
   R2.adj <- lm_stats[1]
@@ -428,6 +446,8 @@ familyPlot_matrix <- function (plot_file, title, color = c('black', 'red', 'gree
     label_all[index_i] <- i#c(3, 1, 2)[i]
     text(mp, E.all$R2[index_i]/2, labels = label_all, cex = 20, col = color[i])
   }
+  
+  }  ## end of else
   
   dev.off()
 }
